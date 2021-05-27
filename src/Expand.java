@@ -7,7 +7,7 @@ public class Expand {
     private int n;
     private char x;
     private String output;
-
+    
     public Expand(String input) {
         output = "";
         a = getA(input);
@@ -16,12 +16,12 @@ public class Expand {
         n = getN(input);
         expand();
     }
-
+    
     private Integer getA(String input) {
         int a;
         Pattern p = Pattern.compile("[A-z]");
         Matcher m = p.matcher(input);
-
+        
         if (!m.find()) {
             return null;
         }
@@ -35,7 +35,7 @@ public class Expand {
             return a;
         }
     }
-
+    
     private char getX(String input) {
         Pattern p = Pattern.compile("[A-z]");
         Matcher m = p.matcher(input);
@@ -45,22 +45,32 @@ public class Expand {
             return input.charAt(m.start());
         }
     }
-
+    
     private int getB(String input) {
-        int b = Integer.parseInt(input.substring(input.indexOf("+") + 1, input.indexOf(")")));
+        int start = input.indexOf("+");
+        if (start == -1)
+            start = input.indexOf("-") - 1;
+        int b = Integer.parseInt(input.substring(start + 1, input.indexOf(")")));
         return b;
     }
-
+    
     private int getN(String input) {
+        if (input.indexOf("^") == -1)
+            return 1;
         int n = Integer.parseInt(input.substring(input.indexOf("^") + 1));
         return n;
     }
-
+    
     private void expand() {
         for (int i = n; i >= 0; --i) {
-            output += binomCoef(n,i)*((int) Math.pow(a,i))*((int) Math.pow(b, (n-i)));
+            int coef = binomCoef(n,i)*((int) Math.pow(a,i))*((int) Math.pow(b, (n-i)));
+            if (coef < 0) {
+                output = output.substring(0, output.length() - 2) + "- ";
+                coef *= -1;
+            }
+            output += coef;
             if (i == 0) {
-                output += " + ";
+                output += " + ";   
             } else if (i == 1) {
                 output += x + " + ";
             }else {
@@ -68,17 +78,17 @@ public class Expand {
             }
         }
     }
-
+    
     private int binomCoef(int n, int k) {
         return (factorial(n))/ (factorial(k) * factorial(n-k));
     }
-
+    
     private int factorial (int n) {
-        int[] fact = {1, 1, 2, 6, 24, 120, 720, 5040, 40320,
+        int[] fact = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 
                 362880, 3628800, 39916800, 479001600};
         return fact[n];
     }
-
+    
     public String toString() {
         return output.substring(0, output.length() - 2);
     }
